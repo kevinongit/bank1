@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: eai-gw
+  name: eai-gw
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: eai-gw
+  template:
+    metadata:
+      labels:
+        app: eai-gw
+    spec:
+      containers:
+      - name: eai-gw
+        image: kevinondock/bank1-eai-gw
+        ports:
+        - containerPort: 8084
+        env:
+        - name: PORT
+          value: "8084"
+        - name: FRONT_WAS_ADDR
+          value: "front-was:8081"
+        - name: FIN_COMPLEX_ADDR
+          value: "fin-complex:8082"
+        - name : MCI_GW_ADDR
+          value: "mci-gw:8083"
+        - name: EAI_GW_ADDR
+          value: "eai-gw:8084"
+        - name: CORE_1_ADDR
+          value: "core-1:8085"
+        - name: CUSTOMER_BS_ADDR
+          value: "customer-bs:9001"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: eai-gw
+spec:
+  type: ClusterIP
+  selector:
+    app: eai-gw
+  ports:
+  - name: grpc
+    port: 8084
+    targetPort: 8084

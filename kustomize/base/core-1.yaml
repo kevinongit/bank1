@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: core-1
+  name: core-1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: core-1
+  template:
+    metadata:
+      labels:
+        app: core-1
+    spec:
+      containers:
+      - name: core-1
+        image: kevinondock/bank1-core-1
+        ports:
+        - containerPort: 8085
+        env:
+        - name: PORT
+          value: "8085"
+        - name: FRONT_WAS_ADDR
+          value: "front-was:8081"
+        - name: FIN_COMPLEX_ADDR
+          value: "fin-complex:8082"
+        - name : MCI_GW_ADDR
+          value: "mci-gw:8083"
+        - name: EAI_GW_ADDR
+          value: "eai-gw:8084"
+        - name: CORE_1_ADDR
+          value: "core-1:8085"
+        - name: CUSTOMER_BS_ADDR
+          value: "customer-bs:9001"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: core-1
+spec:
+  type: ClusterIP
+  selector:
+    app: core-1
+  ports:
+  - name: grpc
+    port: 8085
+    targetPort: 8085

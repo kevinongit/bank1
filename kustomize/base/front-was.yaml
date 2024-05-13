@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: front-was
+  name: front-was
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: front-was
+  template:
+    metadata:
+      labels:
+        app: front-was
+    spec:
+      containers:
+      - name: front-was
+        image: kevinondock/bank1-front-was
+        ports:
+        - containerPort: 8081
+        env:
+        - name: PORT
+          value: "8081"
+        - name: FRONT_WAS_ADDR
+          value: "front-was:8081"
+        - name: FIN_COMPLEX_ADDR
+          value: "fin-complex:8082"
+        - name : MCI_GW_ADDR
+          value: "mci-gw:8083"
+        - name: EAI_GW_ADDR
+          value: "eai-gw:8084"
+        - name: CORE_1_ADDR
+          value: "core-1:8085"
+        - name: CUSTOMER_BS_ADDR
+          value: "customer-bs:9001"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: front-was
+spec:
+  type: ClusterIP
+  selector:
+    app: front-was
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8081
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: front-was-external
+spec:
+  type: LoadBalancer
+  selector:
+    app: front-was
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8081
+    
