@@ -50,7 +50,9 @@ app.get('/customer/:userId', async (req, res) => {
 app.post('/customer', async (req, res) => {
   try {
     const customer = req.body
+    console.log({customer})
     const resp = await customerService.create(customer)
+    console.log({resp})
 
     if (resp.result) {
       res.status(200).json(resp)

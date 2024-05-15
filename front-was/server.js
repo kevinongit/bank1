@@ -19,9 +19,57 @@ app.use(bodyParser.urlencoded({ extended: true }))
 app.use(express.static('public'))
 
 app.get('/', (req, res) => {
-//   res.sendFile(__dirname + '/login.html')
-    res.status(200).json({id: randomId(), message: `${name} is ready!`})
+  res.sendFile('index.html')
+    // res.status(200).json({id: randomId(), message: `${name} is ready!`})
 
+})
+
+app.get('/login', (req, res) => {
+  res.sendFile(__dirname + '/public/login.html')
+    // res.status(200).json({id: randomId(), message: `${name} is ready!`})
+
+})
+
+app.get('/register', (req, res) => {
+  res.sendFile(__dirname + '/public/register.html')
+})
+app.post('/api/v1/login', async (req, res) => {
+  try {
+    console.log(req.body)
+    const { userId } = req.body
+    // res.status(200).json({res: 'ok'})
+      const customerBsAddr = 'http://' + (process.env.CUSTOMER_BS_ADDR || 'localhost:9001')
+      console.log({userId, customerBsAddr})
+      const fetchResult = await fetch(`${customerBsAddr}/customer/${userId}`)
+  
+      const result = await fetchResult.json()
+      
+      res.status(200).json(result)
+  
+//     const customerBsAddr = 'http://' + (process.env.CUSTOMER_BS_ADDR || 'localhost:9001')
+//     const resp = await fetch(`${customerBsAddr}/customer/`,{
+//       method: "POST",
+//       mode: "cors",
+//       cache: "no-cache",
+//       headers: {
+//         "Content-Type": "application/x-www-form-urlencoded",
+//       },
+//       body: customer,
+//     })
+// console.log(resp)
+//     if (resp.result) {
+//       res.status(200).json(resp)
+//     } else {
+//       res.status(401).json(resp)
+//     }
+  } catch (error) {
+    console.log(error)
+    const result = {
+      status: false,
+      reason: error.message,
+    }
+    res.status(401).json(result)
+  }
 })
 
 
@@ -67,23 +115,27 @@ app.get(`/customer/:userId`, async (req, res) => {
   }
 })
 
-app.post('/customer', async (req, res) => {
+app.post('/api/v1/register', async (req, res) => {
   try {
     const customer = req.body
+    console.log({customer})
     const customerBsAddr = 'http://' + (process.env.CUSTOMER_BS_ADDR || 'localhost:9001')
-    const resp = await fetch(`${customerBsAddr}/customer/`,{
+    const fetchResult = await fetch(`${customerBsAddr}/customer/`,{
       method: "POST",
       mode: "cors",
       cache: "no-cache",
       headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
+        "Content-Type": "application/json",
       },
-      body: customer,
+      body: JSON.stringify(customer),
     })
-console.log(resp)
-    if (resp.result) {
+    const resp = await fetchResult.json()
+console.log({resp})
+    if (resp.status) {
+      // res.sendFile(__dirname + '/public/test_ok.html')
       res.status(200).json(resp)
     } else {
+      // res.sendFile(__dirname + '/public/register.html')
       res.status(401).json(resp)
     }
   } catch (error) {
@@ -93,14 +145,6 @@ console.log(resp)
       reason: error.message,
     }
     res.status(401).json(result)
-  }
-})
-
-app.post('/register', async (req, res) => {
-  try {
-    
-  } catch (error) {
-    console.log(error)
   }
 })
 
