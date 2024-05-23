@@ -6,9 +6,9 @@ let db = {};
 
 init();
 
- function init() {
+function init() {
   console.log(dbConfig);
-//   console.log(Sequelize)
+  //   console.log(Sequelize)
   const sequelize = new Sequelize(
     dbConfig.name,
     dbConfig.user,
@@ -20,35 +20,38 @@ init();
       operatorAliases: false,
       pool: dbConfig.pool,
       define: {
-        freezeTableName: true,  /// to prevent auto pluralizing.
+        freezeTableName: true, /// to prevent auto pluralizing.
         timestamp: true,
-      }
+      },
     }
   );
-  mysql.createConnection(({host, port, user, password} = dbConfig))
-    .then(connection => {
-      connection.query(`CREATE DATABASE IF NOT EXISTS ${dbConfig.name};`)
-      console.log(`+ Database(${dbConfig.name}) created.`)
-    }) .catch(error => {
-      console.error(error)
-    })
-
-//   console.log(sequelize);
-  const customerModel = require("./customer.model")
+  //   console.log(sequelize);
   db = {
     Sequelize,
     sequelize,
-    customer: customerModel(sequelize, DataTypes),
+    customer: require("./customer.model")(sequelize, DataTypes),
   };
-  sequelize.sync()
-// sequelize.sync({force: true}) 
-.then(() => {
-  console.log(`+ Database(${dbConfig.name}) connected!`)
-}).catch(error => {
-  console.error(error)
-})
-// console.log({customer :  db.customer})
-  // console.log({db})
+
+  mysql
+    .createConnection(({ host, port, user, password } = dbConfig))
+    .then((connection) => {
+      connection.query(`CREATE DATABASE IF NOT EXISTS ${dbConfig.name};`);
+      console.log(`+ connecting to (${dbConfig.name}).`);
+      sequelize
+        .sync()
+        // sequelize.sync({force: true})
+        .then(() => {
+          console.log(`+ (${dbConfig.name}) connected!`);
+        })
+        .catch((error) => {
+          console.error(error);
+          throw new Error(error);
+        });
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+
 }
 
-module.exports = db
+module.exports = db;

@@ -1,4 +1,12 @@
 
+############
+## in POD, use curl
+arch
+wget https://github.com/moparisthebest/static-curl/releases/download/v7.80.0/curl-amd64
+chmod +x ./curl-amd64
+./curl-amd64 -X POST --insecure https://ptsv2.com/t/57y8r-1640280329/post
+
+
 ###########
 docker buildx build -t kevinondock/bank1-front-was . 
 
@@ -16,6 +24,7 @@ kubectl get svc  # front-was-external PORT (second)
 ####### database docker
 docker pull mysql
 docker run -p 3306:3306 --name=mysql -e MYSQL_ROOT_PASSWORD=root -d mysql
+docker start mysql-container
 docker exec -it mysql bash
 # docker comes from minikube => get its ip from $ minikube docker-env
 mysql -h 192.168.64.2 -P 3306 -u root -p

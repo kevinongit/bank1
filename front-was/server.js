@@ -19,8 +19,8 @@ app.use(bodyParser.urlencoded({ extended: true }))
 app.use(express.static('public'))
 
 app.get('/', (req, res) => {
-  res.sendFile('index.html')
-    // res.status(200).json({id: randomId(), message: `${name} is ready!`})
+  // res.sendFile('index.html')
+    res.status(200).json({id: randomId(), message: `${name} is ready!`})
 
 })
 
